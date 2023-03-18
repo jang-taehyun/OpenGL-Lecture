@@ -12,11 +12,13 @@ public:
 		GLuint fragmentShader;
 		GLuint TessellationControlShader;
 		GLuint TessellationEvaluationShader;
+		GLuint GeometryShader;
 
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		TessellationControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
 		TessellationEvaluationShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		GeometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 
 		const GLchar* vertexShaderSource[] =
 		{
@@ -39,6 +41,7 @@ public:
 			//"	VertexShaderColor = color;									\n"
 			//"}																\n"
 
+			// geometry shader 까지 먹인 vertex shader
 			"#version 430 core												\n"
 			"																\n"
 			"layout (location = 0) in vec4 offset;							\n"
@@ -59,6 +62,42 @@ public:
 			"	vs_out.color = color;										\n"
 			"}																\n"
 
+			// gl_FragCoord 사용 예시 vertex shader
+			//"#version 430 core												\n"
+			//"																\n"
+			//"layout (location = 0) in vec4 offset;							\n"
+			//"																\n"
+			//"void main()													\n"
+			//"{																\n"
+			//"	const vec4 vertices[3] = vec4[3](							\n"
+			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
+			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
+			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
+			//"								);								\n"
+			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
+			//"}																\n"
+
+			// 입력 보간 vertex shader
+			//"#version 430 core												\n"
+			//"																\n"
+			//"layout (location = 0) in vec4 offset;							\n"
+			//"																\n"
+			//"out vec4 vs_color;												\n"
+			//"																\n"
+			//"void main()													\n"
+			//"{																\n"
+			//"	const vec4 vertices[3] = vec4[3](							\n"
+			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
+			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
+			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
+			//"								);								\n"
+			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
+			//"	vec4 colors[3] = vec4[3](vec4(1.f, 0.f, 0.f, 1.f),			\n"
+			//"							 vec4(0.f, 1.f, 0.f, 1.f),			\n"
+			//"							 vec4(0.f, 0.f, 1.f, 1.f));			\n"
+			//"	vs_color = colors[gl_VertexID];								\n"
+			//"}																\n"
+
 		};
 		glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
 
@@ -74,9 +113,10 @@ public:
 			//"	color = VertexShaderColor;			\n"
 			//"}										\n"
 
+			// geometry shader 까지 먹인 fragment shader
 			"#version 430 core						\n"
 			"										\n"
-			"in	VS_OUT {							\n"			// 블록 이름(in 키워드와 매칭)
+			"in VS_OUT {							\n"			// 블록 이름(in 키워드와 매칭)
 			"	vec4 color;							\n"			// 블록 내부 멤버 변수(in 키워드와 매칭)
 			"} fs_in;								\n"			// 변수 이름(in 키워드와 매칭 안해도 됨)
 			"out vec4 color;						\n"
@@ -85,6 +125,31 @@ public:
 			"{										\n"
 			"	color = fs_in.color;				\n"
 			"}										\n"
+
+			// gl_FrgaCoord 사용 예시 fragment shader
+			//"#version 430 core															\n"
+			//"																			\n"
+			//"out vec4 color;															\n"
+			//"																			\n"
+			//"void main()																\n"
+			//"{																			\n"
+			//"	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,					\n"
+			//"				 cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,					\n"
+			//"				 sin(gl_FragCoord.x * 0.25) * cos(gl_FragCoord.y * 0.25),	\n"
+			//"				 1.f);														\n"
+			//"}																			\n"
+
+			//// 입력 보간 fragment shader
+			//"#version 430 core						\n"
+			//"										\n"
+			//"in vec4 vs_color;						\n"
+			//"out vec4 color;						\n"
+			//"										\n"
+			//"void main()							\n"
+			//"{										\n"
+			//"	color = vs_color;					\n"
+			//"}										\n"
+
 		};
 		glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);
 
@@ -121,10 +186,32 @@ public:
 		};
 		glShaderSource(TessellationEvaluationShader, 1, TESsource, NULL);
 
+		const GLchar* GeometryShaderSource[] = {
+			"#version 430 core											\n"
+			"															\n"
+			"layout (triangles) in;										\n"
+			"layout (points, max_vertices = 6) out;						\n"
+			"															\n"
+			"void main()												\n"
+			"{															\n"
+			"	int index;												\n"
+			"	for(index=0; index<gl_in.length(); index++)				\n"
+			"	{														\n"
+			"		gl_Position = gl_in[index].gl_Position;				\n"
+			"		EmitVertex();										\n"
+			"		gl_Position[0] *= -1;								\n"
+			"		gl_Position[1] *= -1;								\n"
+			"		EmitVertex();										\n"
+			"	}														\n"
+			"}															\n"
+		};
+		glShaderSource(GeometryShader, 1, GeometryShaderSource, NULL);
+
 		glCompileShader(vertexShader);
 		glCompileShader(fragmentShader);
 		glCompileShader(TessellationControlShader);
 		glCompileShader(TessellationEvaluationShader);
+		glCompileShader(GeometryShader);
 
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
@@ -133,6 +220,7 @@ public:
 		glAttachShader(shaderProgram, fragmentShader);
 		glAttachShader(shaderProgram, TessellationControlShader);
 		glAttachShader(shaderProgram, TessellationEvaluationShader);
+		glAttachShader(shaderProgram, GeometryShader);
 
 		glLinkProgram(shaderProgram);
 
@@ -140,6 +228,7 @@ public:
 		glDeleteShader(fragmentShader);
 		glDeleteShader(TessellationControlShader);
 		glDeleteShader(TessellationEvaluationShader);
+		glDeleteShader(GeometryShader);
 
 		return shaderProgram;
 	}
@@ -168,7 +257,7 @@ public:
 		glUseProgram(RenderingProgram);
 
 		// vertex attribute의 0번째 index의 값을 갱신(삼각형 offset)
-		GLfloat attrib[] = {
+		const GLfloat attrib[] = {
 						(float)sin(currentTime) * 0.5f,		// x
 						(float)cos(currentTime) * 0.5f,		// y
 						0.f,								// z
@@ -178,22 +267,28 @@ public:
 						  attrib		// const GLfloat* v : attribute에 넣을 새로운 data를 가르키는 pointer
 		);
 		// vertex attribute의 1번째 index의 값을 갱신(삼각형 color)
-		GLfloat color[] = {
+		const GLfloat color[] = {
 						1.f,								// R
 						0.f,								// G
 						0.f,								// B
-						0.f									// A
+						1.f									// A
 		};
 		glVertexAttrib4fv(1, color);
 
 		// tessellation 사용 전
 		// glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		// tessellation 사용 후
-		glDrawArrays(GL_PATCHES, 0, 3);
+		// point 크기 설정
+		glPointSize(5.f);
+
+		// patch당 제어점의 개수 설정
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 		// tessellation 결과를 보기 위해 wireframe mode로 변경
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		// tessellation 사용
+		glDrawArrays(GL_PATCHES, 0, 3);
 
 		glUseProgram(0);
 	}
