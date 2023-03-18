@@ -110,14 +110,13 @@ public:
 		const GLchar* TESsource[] = {
 			"#version 430 core											\n"
 			"															\n"
-			"layout (trianglem, equal_spacing, cw) in;					\n"
+			"layout (triangles, equal_spacing, cw) in;					\n"
 			"															\n"
 			"void main()												\n"
 			"{															\n"
 			"	gl_Position = (gl_TessCoord.x * gl_in[0].gl_Position +  \n"
 			"				   gl_TessCoord.y * gl_in[1].gl_Position +  \n"
-			"				   gl_TessCoord.z * gl_in[2].gl_Position	\n"
-			"				  );										\n"
+			"				   gl_TessCoord.z * gl_in[2].gl_Position);	\n"
 			"}															\n"
 		};
 		glShaderSource(TessellationEvaluationShader, 1, TESsource, NULL);
