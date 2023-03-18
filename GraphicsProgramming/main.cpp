@@ -1,39 +1,52 @@
 #include <sb7.h>
 
-// shader : graphics pipeline이 돌아가는 단위
-// 레스터라이저 : vertex에 색상을 채우는 역할
-
 class tmp : public sb7::application
 {
 private:
 	GLuint RenderingProgram;		// shader program
-	GLuint VertexArrayObject;		// vertex array object(VAO) : vertex fetch stage를 나타내는 object
-									// -> OpenGL pipeline의 input과 관련된 모든 상태를 유지
+	GLuint VertexArrayObject;		// vertex array object(VAO)
 public:
 	GLuint CompileShader()
 	{
-		// shader object ID
 		GLuint vertexShader;
 		GLuint fragmentShader;
+		GLuint TessellationControlShader;
+		GLuint TessellationEvaluationShader;
 
-		// 1. shader object 생성
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);		// shader type을 명시해 어떤 shader object를 생성할 지 명시
+		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		TessellationControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+		TessellationEvaluationShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
 
-		// 2. shader source code를 shader object에 전달 : shader source code는 각 vertex마다 호출됨(vertex의 개수만큼 호출된다!)
 		const GLchar* vertexShaderSource[] =
 		{
-			// Point
-			//// GLSL version && profile
-			//"#version 430 core							\n"
-			//"											\n"
-			//"void main()								\n"
-			//"{											\n"
-			//"	gl_Position = vec4(0.f, 0.f, 0.5f, 1.f);\n"		// vertex의 output 지정
-			//"}											\n"
-			
-			// Triangle
+			//"#version 430 core												\n"
+			//"																\n"
+			//"layout (location = 0) in vec4 offset;							\n"		// layout 키워드 : vertex attribute를 받을 때 사용
+			//																		// location 다음의 숫자와 vertex attribute의 index와 같아야 한다.
+			//"layout (location = 1) in vec4 color;							\n"
+			//"																\n"
+			//"out vec4 VertexShaderColor;									\n"
+			//"																\n"
+			//"void main()													\n"
+			//"{																\n"
+			//"	const vec4 vertices[3] = vec4[3](							\n"
+			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
+			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
+			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
+			//"								);								\n"
+			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
+			//"	VertexShaderColor = color;									\n"
+			//"}																\n"
+
 			"#version 430 core												\n"
+			"																\n"
+			"layout (location = 0) in vec4 offset;							\n"
+			"layout (location = 1) in vec4 color;							\n"
+			"																\n"
+			"out VS_OUT {													\n"		// 블록 이름(in 키워드와 매칭)
+			"	vec4 color;													\n"		// 블록 내부 멤버 변수(in 키워드와 매칭)
+			"} vs_out;														\n"		// 변수 이름(in 키워드와 매칭 안해도 됨)
 			"																\n"
 			"void main()													\n"
 			"{																\n"
@@ -42,50 +55,92 @@ public:
 			"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
 			"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
 			"								);								\n"
-			"	gl_Position = vertices[gl_VertexID];						\n"		// gl_VertexID : glDrawArrays()의 first부터 시작하여 count만큼의 vertex의 index를 1씩 증가하는 OpenGL 내장 변수
-																					// -> gl_VertexID를 통해 현재 vertex shader가 몇 번째 vertex에 적용하고 있는지 알 수 있다.
-																					// -> vertex shader에서만 사용 가능
+			"	gl_Position = vertices[gl_VertexID] + offset;				\n"
+			"	vs_out.color = color;										\n"
 			"}																\n"
 
 		};
-		glShaderSource(vertexShader,			// shader object
-					   1,						// source code의 개수(상수형 string의 line의 개수)
-					   vertexShaderSource,		// source code
-					   NULL						// source code의 문자 개수 : NULL 입력 시 자동으로 문자의 개수 파악
-		);
+		glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
 
 		const GLchar* fragmentShaderSource[]
 		{
+			//"#version 430 core						\n"
+			//"										\n"
+			//"in vec4 VertexShaderColor;				\n"
+			//"out vec4 color;						\n"
+			//"										\n"
+			//"void main()							\n"
+			//"{										\n"
+			//"	color = VertexShaderColor;			\n"
+			//"}										\n"
+
 			"#version 430 core						\n"
 			"										\n"
-			"out vec4 color;						\n"	// out 키워드를 이용해 color 변수를 output 변수로 사용
+			"in	VS_OUT {							\n"			// 블록 이름(in 키워드와 매칭)
+			"	vec4 color;							\n"			// 블록 내부 멤버 변수(in 키워드와 매칭)
+			"} fs_in;								\n"			// 변수 이름(in 키워드와 매칭 안해도 됨)
+			"out vec4 color;						\n"
 			"										\n"
 			"void main()							\n"
 			"{										\n"
-			"	color = vec4(0.f, 0.f, 1.f, 1.f);	\n"
+			"	color = fs_in.color;				\n"
 			"}										\n"
 		};
 		glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);
 
-		// 3. shader sourse code compile
-		glCompileShader(vertexShader);			// shader object 전달
-		glCompileShader(fragmentShader);
+		const GLchar* TCSsource[] = {
+			"#version 430 core																\n"
+			"																				\n"
+			"layout (vertices = 3) out;														\n"		// 출력 제어점의 개수 설정
+			"																				\n"
+			"void main()																	\n"
+			"{																				\n"
+			"	if(gl_InvocationID == 0) {													\n"		// 제어점 호출(gl__VertexID와 동일)
+																									// 세분화 정보 설정
+			"		gl_TessLevelInner[0] = 5.f;												\n"		// Inner level 설정 : polygon 내부 세분화 설정
+			"		gl_TessLevelOuter[0] = 5.f;												\n"		// outer level 설정 : polygon의 각 변의 세분화 설정
+			"		gl_TessLevelOuter[1] = 5.f;												\n"
+			"		gl_TessLevelOuter[2] = 5.f;												\n"
+			"	}																			\n"
+			"	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;	\n"		// 제어점들을 그룹으로 묶어 한번에 처리
+			"}																				\n"
+		};
+		glShaderSource(TessellationControlShader, 1, TCSsource, NULL);
 
-		// 4. shader program object 생성
+		const GLchar* TESsource[] = {
+			"#version 430 core											\n"
+			"															\n"
+			"layout (trianglem, equal_spacing, cw) in;					\n"
+			"															\n"
+			"void main()												\n"
+			"{															\n"
+			"	gl_Position = (gl_TessCoord.x * gl_in[0].gl_Position +  \n"
+			"				   gl_TessCoord.y * gl_in[1].gl_Position +  \n"
+			"				   gl_TessCoord.z * gl_in[2].gl_Position	\n"
+			"				  );										\n"
+			"}															\n"
+		};
+		glShaderSource(TessellationEvaluationShader, 1, TESsource, NULL);
+
+		glCompileShader(vertexShader);
+		glCompileShader(fragmentShader);
+		glCompileShader(TessellationControlShader);
+		glCompileShader(TessellationEvaluationShader);
+
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
 
-		// 5. shader program object에 shader object attach
-		glAttachShader(shaderProgram,					// shader program object
-					  vertexShader);					// shader object
+		glAttachShader(shaderProgram, vertexShader);
 		glAttachShader(shaderProgram, fragmentShader);
+		glAttachShader(shaderProgram, TessellationControlShader);
+		glAttachShader(shaderProgram, TessellationEvaluationShader);
 
-		// 6. shader program에 attach된 모든 shader object를 link ==> OpenGL과 shader program을 link
 		glLinkProgram(shaderProgram);
 
-		// 7. shader object 반환
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
+		glDeleteShader(TessellationControlShader);
+		glDeleteShader(TessellationEvaluationShader);
 
 		return shaderProgram;
 	}
@@ -94,72 +149,85 @@ public:
 	// application initialize
 	virtual void startup()
 	{
-		// shader program 생성
 		RenderingProgram = CompileShader();
 
-		// Vertex Array Object(VAO) 생성
 		glGenVertexArrays(1, &VertexArrayObject);
-		// VAO를 pipeline에 bind(연결)
 		glBindVertexArray(VertexArrayObject);
 	}
 
-	// main loop : rendering code
-	// currentTime : Application이 시작한 이후의 경과 시간(second 단위)
-	// -> animation을 위한 값으로 활용 가능
+	// rendering
 	virtual void render(double currentTime)
 	{
-		// 추상화를 위해 0~1 사이의 value 사용
-		const GLfloat red[] = { (float)sin(currentTime) * 0.5f + 0.5f,		// R
-								(float)cos(currentTime) * 0.5f + 0.5f,		// G
-								(float)sin(currentTime) * 0.5f + 0.5f,		// B
-								1.f											// A : 
-							  };
+		const GLfloat ClearColor[] = { (float)sin(currentTime) * 0.5f + 0.5f,		// R
+									   (float)cos(currentTime) * 0.5f + 0.5f,		// G
+									   (float)sin(currentTime) * 0.5f + 0.5f,		// B
+									   1.f											// A
+									 };
 
-		// 화면에 뿌려질 Framebuffer를 특정 RGB-A 값으로 지우기
-		glClearBufferfv(GL_COLOR,			// GLenum buffer : 표적 FrameBuffer의 type
-											// -> 다양한 키워드 존재 && glDocs에 사용할 수 있는 키워드 존재
-						0,					// GLint drawbuffer : 출력 buffer가 여러 개 일때 지정(0기반 index 사용)
-											// -> 동일한 buffer가 여러 개 있을 때 사용 && default(0)인 경우 default draw framebuffer 또는 framebufffer object를 가르킨다.
-						red);				// const GLfloat* value : 지울 color 값
+		glClearBufferfv(GL_COLOR, 0, ClearColor);
 
-		// 사용할 shader program 명시
 		glUseProgram(RenderingProgram);
 
-		//glPointSize(40.f);					// -> Point의 크기 조절
+		// vertex attribute의 0번째 index의 값을 갱신(삼각형 offset)
+		GLfloat attrib[] = {
+						(float)sin(currentTime) * 0.5f,		// x
+						(float)cos(currentTime) * 0.5f,		// y
+						0.f,								// z
+						0.f									// homogeneous 상수
+		};
+		glVertexAttrib4fv(0,			// GLuint index : vertex shader에서 attribute을 참조하기 위한 index
+						  attrib		// const GLfloat* v : attribute에 넣을 새로운 data를 가르키는 pointer
+		);
+		// vertex attribute의 1번째 index의 값을 갱신(삼각형 color)
+		GLfloat color[] = {
+						1.f,								// R
+						0.f,								// G
+						0.f,								// B
+						0.f									// A
+		};
+		glVertexAttrib4fv(1, color);
 
-		//// draw
-		//glDrawArrays(GL_POINTS,			// GLenum mode : primitive 명시
-		//			 0,						// GLint first : 시작 index
-		//			 1						// GLsizei count : index의 개수
-		//);
-		// -> line 또는 triangle에서 2개 이상의 vertex가 같은 위치에 있다면 primitive가 취소된다.
+		// tessellation 사용 전
+		// glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// tessellation 사용 후
+		glDrawArrays(GL_PATCHES, 0, 3);
+
+		// tessellation 결과를 보기 위해 wireframe mode로 변경
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		glUseProgram(0);
 	}
 
 	virtual void shutdown()
 	{
-		// VAO 반환
 		glDeleteVertexArrays(1, &VertexArrayObject);
-		// shader progrma 반환
 		glDeleteProgram(RenderingProgram);
 	}
 };
 
 DECLARE_MAIN(tmp)
 
-/**
-* 모든 OpenGL function은 gl로 시작(접두사 gl)
-* 'gl_'로 시작하는 변수는 OpenGL에 내장된 variable, 다른 스테이지의 shader들과 연결된다.
-* 
-* fv : 인자 타입을 접미사로 줄여쓰는 convention 중 하나(규칙, 약속)
-* -> f : 부동소수점, v : 벡터(배열)
-* 
-* shader source code는 shader object에 전달되어 OpenGL에 내장된 compiler에서 compile된다.
-* -> shader source code의 흐름 : CPU side -> GPU side(shader object) -> GPU side(OpenGL compiler)
-* 
-* shader program object는 여러 shader shader object들과 연결되어 있다.
-* 
-* vertex shader : vertex의 position을 처리
-* fragment shader : 그려질 2D image의 pixel 값 지정
+/*
+* 각 pipeline의 shader에 data를 전달하는 방법 : in, out 키워드 사용
+  - 파이프라인에서 전역 변수를 선언하고 사용하는 방식
+  - in 키워드 : 이전 stage에서 계산한 값을 현재 stage로 받아오는 키워드
+  - out 키워드 : 현재 stage에서 계산한 값을 다음 stage로 전달하는 키워드
+  - 주의 사항
+    - 이전 stage에서 out 키워드를 이용해 전달한 변수의 이름과 data type은,
+	  다음 stage의 in 키워드를 이용해 받는 변수의 이름과 data tyep이 같아야 한다!
+	  ex) vertex shader에서 vec4 B에 out 키워드를 선언했다면, fragment shader에서 in 키워드에 들어가는 변수는 vec4 B로 선언해야 한다!
+
+* interface block : 여러 변수를 하나의 interface block으로 그룹화 가능
+  - C언어의 structure와 유사 : struct 대신 in 또는 out 키워드 사용
+  - interface block은 '블록 이름'(변수 이름 아님)을 사용해 매칭한다!
+  - in 또는 out 키워드로 넘길 때 블록 이름과 내부 멤버 변수의 이름과 내부 멤버 변수의 data type은 같아야 한다.
+    -> 블록 뒤에 변수 이름은 달라져도 됨!
+
+* tessellation : polygon을 여러 개의 polygon으로 쪼개는 작업
+  - patch(고차 primitive)를 더 작고, 단순한 여러 개의 렌더링 가능한 primitive로 분할하는 작업
+  - low-polygon의 3D model을 tessellation을 이용해 매끄러운 평면으로 만들 수 있다!(Subdivision 작업)
+
+* Tessellation control shader : tessellation level(분할 정도) 결정 & tessellation evaluation shader에 보낼 data 생성
+  - in 또는 out 키워드를 이용해 data 전달
 */
