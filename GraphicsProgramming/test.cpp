@@ -22,35 +22,14 @@ public:
 
 		const GLchar* vertexShaderSource[] =
 		{
-			//"#version 430 core												\n"
-			//"																\n"
-			//"layout (location = 0) in vec4 offset;							\n"		// layout 키워드 : vertex attribute를 받을 때 사용
-			//																		// location 다음의 숫자와 vertex attribute의 index와 같아야 한다.
-			//"layout (location = 1) in vec4 color;							\n"
-			//"																\n"
-			//"out vec4 VertexShaderColor;									\n"
-			//"																\n"
-			//"void main()													\n"
-			//"{																\n"
-			//"	const vec4 vertices[3] = vec4[3](							\n"
-			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
-			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
-			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
-			//"								);								\n"
-			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
-			//"	VertexShaderColor = color;									\n"
-			//"}																\n"
-
-			// geometry shader 까지 먹인 vertex shader
 			"#version 430 core												\n"
 			"																\n"
 			"layout (location = 0) in vec4 offset;							\n"
 			"layout (location = 1) in vec4 color;							\n"
 			"																\n"
-			//"out VS_OUT {													\n"		// 블록 이름(in 키워드와 매칭)
-			//"	vec4 color;													\n"		// 블록 내부 멤버 변수(in 키워드와 매칭)
-			//"} vs_out;														\n"		// 변수 이름(in 키워드와 매칭 안해도 됨)
-			"out vec4 vs_color;												\n"
+			"out VS_OUT {													\n"		// 블록 이름(in 키워드와 매칭)
+			"	vec4 color;													\n"		// 블록 내부 멤버 변수(in 키워드와 매칭)
+			"} vs_out;														\n"		// 변수 이름(in 키워드와 매칭 안해도 됨)
 			"																\n"
 			"void main()													\n"
 			"{																\n"
@@ -60,100 +39,22 @@ public:
 			"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
 			"								);								\n"
 			"	gl_Position = vertices[gl_VertexID] + offset;				\n"
-			//"	vs_out.color = color;										\n"
-			"	vs_color = color;											\n"
+			"	vs_out.color = color;										\n"
 			"}																\n"
-
-			// gl_FragCoord 사용 예시 vertex shader
-			//"#version 430 core												\n"
-			//"																\n"
-			//"layout (location = 0) in vec4 offset;							\n"
-			//"																\n"
-			//"void main()													\n"
-			//"{																\n"
-			//"	const vec4 vertices[3] = vec4[3](							\n"
-			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
-			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
-			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
-			//"								);								\n"
-			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
-			//"}																\n"
-
-			// 입력 보간 vertex shader
-			//"#version 430 core												\n"
-			//"																\n"
-			//"layout (location = 0) in vec4 offset;							\n"
-			//"																\n"
-			//"out vec4 vs_color;												\n"
-			//"																\n"
-			//"void main()													\n"
-			//"{																\n"
-			//"	const vec4 vertices[3] = vec4[3](							\n"
-			//"								vec4(0.25f, -0.25f, 0.5f, 1.f), \n"
-			//"								vec4(-0.25f, 0.25f, 0.5f, 1.f), \n"
-			//"								vec4(0.25f,  0.25f, 0.5f, 1.f)  \n"
-			//"								);								\n"
-			//"	gl_Position = vertices[gl_VertexID] + offset;				\n"
-			//"	vec4 colors[3] = vec4[3](vec4(1.f, 0.f, 0.f, 1.f),			\n"
-			//"							 vec4(0.f, 1.f, 0.f, 1.f),			\n"
-			//"							 vec4(0.f, 0.f, 1.f, 1.f));			\n"
-			//"	vs_color = colors[gl_VertexID];								\n"
-			//"}																\n"
-
 		};
 		glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
 
 		const GLchar* fragmentShaderSource[]
 		{
-			//"#version 430 core						\n"
-			//"										\n"
-			//"in vec4 VertexShaderColor;				\n"
-			//"out vec4 color;						\n"
-			//"										\n"
-			//"void main()							\n"
-			//"{										\n"
-			//"	color = VertexShaderColor;			\n"
-			//"}										\n"
-
-			// geometry shader 까지 먹인 fragment shader
 			"#version 430 core						\n"
 			"										\n"
-			//"in VS_OUT {							\n"			// 블록 이름(in 키워드와 매칭)
-			//"	vec4 color;							\n"			// 블록 내부 멤버 변수(in 키워드와 매칭)
-			//"} fs_in;								\n"			// 변수 이름(in 키워드와 매칭 안해도 됨)
-			"in vec4 vs_color;						\n"
-			"out vec4 color;						\n"
+			"in vec4 tes_color;						\n"
+			"out vec4 fs_color;						\n"
 			"										\n"
 			"void main()							\n"
 			"{										\n"
-			//"	color = fs_in.color;				\n"
-			"	color = vs_color;					\n"
+			"	fs_color = tes_color;				\n"
 			"}										\n"
-
-			// gl_FrgaCoord 사용 예시 fragment shader
-			//"#version 430 core															\n"
-			//"																			\n"
-			//"out vec4 color;															\n"
-			//"																			\n"
-			//"void main()																\n"
-			//"{																			\n"
-			//"	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,					\n"
-			//"				 cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,					\n"
-			//"				 sin(gl_FragCoord.x * 0.25) * cos(gl_FragCoord.y * 0.25),	\n"
-			//"				 1.f);														\n"
-			//"}																			\n"
-
-			//// 입력 보간 fragment shader
-			//"#version 430 core						\n"
-			//"										\n"
-			//"in vec4 vs_color;						\n"
-			//"out vec4 color;						\n"
-			//"										\n"
-			//"void main()							\n"
-			//"{										\n"
-			//"	color = vs_color;					\n"
-			//"}										\n"
-
 		};
 		glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);
 
@@ -161,6 +62,10 @@ public:
 			"#version 430 core																\n"
 			"																				\n"
 			"layout (vertices = 3) out;														\n"		// 출력 제어점의 개수 설정
+			"in VS_OUT {																	\n"
+			"	vec4 color;																	\n"
+			"} tcs_in;																		\n"
+			"out vec4 tcs_color[];															\n"
 			"																				\n"
 			"void main()																	\n"
 			"{																				\n"
@@ -172,6 +77,7 @@ public:
 			"		gl_TessLevelOuter[2] = 5.f;												\n"
 			"	}																			\n"
 			"	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;	\n"		// 제어점들을 그룹으로 묶어 한번에 처리
+			"	tcs_color[gl_InvocationID] = tcs_in.color;									\n"
 			"}																				\n"
 		};
 		glShaderSource(TessellationControlShader, 1, TCSsource, NULL);
@@ -180,12 +86,16 @@ public:
 			"#version 430 core											\n"
 			"															\n"
 			"layout (triangles, equal_spacing, cw) in;					\n"
+			"in vec4 tcs_color[];										\n"
+			"out vec4 tes_color;										\n"
 			"															\n"
 			"void main()												\n"
 			"{															\n"
 			"	gl_Position = (gl_TessCoord.x * gl_in[0].gl_Position +  \n"
 			"				   gl_TessCoord.y * gl_in[1].gl_Position +  \n"
 			"				   gl_TessCoord.z * gl_in[2].gl_Position);	\n"
+			"															\n"
+			"	tes_color = gl_TessCoord.x * tcs_color[0] + gl_TessCoord.y * tcs_color[1] + gl_TessCoord.z * tcs_color[2];\n"
 			"}															\n"
 		};
 		glShaderSource(TessellationEvaluationShader, 1, TESsource, NULL);
@@ -211,11 +121,62 @@ public:
 		};
 		glShaderSource(GeometryShader, 1, GeometryShaderSource, NULL);
 
+		GLint compileResult;													// shader compile 성공 여부 확인
+
 		glCompileShader(vertexShader);
+		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compileResult);
+		if (compileResult != GL_TRUE)
+		{
+			fprintf(stdout, "vertex shader compile failed\n");
+			GLsizei logLength;
+			GLchar logMessage[1024];
+			glGetShaderInfoLog(vertexShader, 1024, &logLength, logMessage);
+			fprintf(stdout, "%s", logMessage);
+		}
+
 		glCompileShader(fragmentShader);
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &compileResult);
+		if (compileResult != GL_TRUE)
+		{
+			fprintf(stdout, "fragment Shader compile failed\n");
+			GLsizei logLength;
+			GLchar logMessage[1024];
+			glGetShaderInfoLog(fragmentShader, 1024, &logLength, logMessage);
+			fprintf(stdout, "%s", logMessage);
+		}
+
 		glCompileShader(TessellationControlShader);
+		glGetShaderiv(TessellationControlShader, GL_COMPILE_STATUS, &compileResult);
+		if (compileResult != GL_TRUE)
+		{
+			fprintf(stdout, "TessellationControl Shader compile failed\n");
+			GLsizei logLength;
+			GLchar logMessage[1024];
+			glGetShaderInfoLog(TessellationControlShader, 1024, &logLength, logMessage);
+			fprintf(stdout, "%s", logMessage);
+		}
+
 		glCompileShader(TessellationEvaluationShader);
+		glGetShaderiv(TessellationEvaluationShader, GL_COMPILE_STATUS, &compileResult);
+		if (compileResult != GL_TRUE)
+		{
+			fprintf(stdout, "TessellationEvaluation Shader compile failed\n");
+			GLsizei logLength;
+			GLchar logMessage[1024];
+			glGetShaderInfoLog(TessellationEvaluationShader, 1024, &logLength, logMessage);
+			fprintf(stdout, "%s", logMessage);
+		}
+
 		glCompileShader(GeometryShader);
+		glGetShaderiv(GeometryShader, GL_COMPILE_STATUS, &compileResult);
+		if (compileResult != GL_TRUE)
+		{
+			fprintf(stdout, "Geometry Shader compile failed\n");
+			GLsizei logLength;
+			GLchar logMessage[1024];
+			glGetShaderInfoLog(GeometryShader, 1024, &logLength, logMessage);
+			fprintf(stdout, "%s", logMessage);
+		}
 
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
@@ -254,7 +215,7 @@ public:
 									   (float)cos(currentTime) * 0.5f + 0.5f,		// G
 									   (float)sin(currentTime) * 0.5f + 0.5f,		// B
 									   1.f											// A
-									 };
+		};
 
 		glClearBufferfv(GL_COLOR, 0, ClearColor);
 
@@ -268,7 +229,7 @@ public:
 						0.f									// homogeneous 상수
 		};
 		glVertexAttrib4fv(0,			// GLuint index : vertex shader에서 attribute을 참조하기 위한 index
-						  attrib		// const GLfloat* v : attribute에 넣을 새로운 data를 가르키는 pointer
+			attrib						// const GLfloat* v : attribute에 넣을 새로운 data를 가르키는 pointer
 		);
 		// vertex attribute의 1번째 index의 값을 갱신(삼각형 color)
 		const GLfloat color[] = {
@@ -306,26 +267,8 @@ public:
 
 DECLARE_MAIN(tmp)
 
+
 /*
-* 각 pipeline의 shader에 data를 전달하는 방법 : in, out 키워드 사용
-  - 파이프라인에서 전역 변수를 선언하고 사용하는 방식
-  - in 키워드 : 이전 stage에서 계산한 값을 현재 stage로 받아오는 키워드
-  - out 키워드 : 현재 stage에서 계산한 값을 다음 stage로 전달하는 키워드
-  - 주의 사항
-    - 이전 stage에서 out 키워드를 이용해 전달한 변수의 이름과 data type은,
-	  다음 stage의 in 키워드를 이용해 받는 변수의 이름과 data tyep이 같아야 한다!
-	  ex) vertex shader에서 vec4 B에 out 키워드를 선언했다면, fragment shader에서 in 키워드에 들어가는 변수는 vec4 B로 선언해야 한다!
-
-* interface block : 여러 변수를 하나의 interface block으로 그룹화 가능
-  - C언어의 structure와 유사 : struct 대신 in 또는 out 키워드 사용
-  - interface block은 '블록 이름'(변수 이름 아님)을 사용해 매칭한다!
-  - in 또는 out 키워드로 넘길 때 블록 이름과 내부 멤버 변수의 이름과 내부 멤버 변수의 data type은 같아야 한다.
-    -> 블록 뒤에 변수 이름은 달라져도 됨!
-
-* tessellation : polygon을 여러 개의 polygon으로 쪼개는 작업
-  - patch(고차 primitive)를 더 작고, 단순한 여러 개의 렌더링 가능한 primitive로 분할하는 작업
-  - low-polygon의 3D model을 tessellation을 이용해 매끄러운 평면으로 만들 수 있다!(Subdivision 작업)
-
-* Tessellation control shader : tessellation level(분할 정도) 결정 & tessellation evaluation shader에 보낼 data 생성
-  - in 또는 out 키워드를 이용해 data 전달
+* tessellation을 거치면 vertex attribute들을 직접 보간해줘야 한다!!
+* https://codeonwort.tistory.com/298
 */
