@@ -15,8 +15,8 @@ public:
 		GLuint vertexShader;
 		GLuint fragmentShader;
 
-		vertexShader = sb7::shader::load("pinWheel_vs.glsl", GL_VERTEX_SHADER);
-		fragmentShader = sb7::shader::load("pinWheel_ps.glsl", GL_FRAGMENT_SHADER);
+		vertexShader = sb7::shader::load("./pinWheel_vs.glsl", GL_VERTEX_SHADER);
+		fragmentShader = sb7::shader::load("./pinWheel_ps.glsl", GL_FRAGMENT_SHADER);
 
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
@@ -36,8 +36,8 @@ public:
 		GLuint vertexShader;
 		GLuint fragmentShader;
 
-		vertexShader = sb7::shader::load("stick_vs.glsl", GL_VERTEX_SHADER);
-		fragmentShader = sb7::shader::load("stick_ps.glsl", GL_FRAGMENT_SHADER);
+		vertexShader = sb7::shader::load("./stick_vs.glsl", GL_VERTEX_SHADER);
+		fragmentShader = sb7::shader::load("./stick_ps.glsl", GL_FRAGMENT_SHADER);
 
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
