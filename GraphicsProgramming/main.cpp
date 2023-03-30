@@ -1,4 +1,5 @@
 #include <sb7.h>
+#include <shader.h>
 
 class tmp : public sb7::application
 {
@@ -13,6 +14,10 @@ public:
 		GLuint TessellationControlShader;
 		GLuint TessellationEvaluationShader;
 		GLuint GeometryShader;
+
+		// -> glsl 파일로 로드하는 방법
+		// --> shader 컴파일까지 해준다!
+		// vertexShader = sb7::shader::load("pinWheel_vs.glsl", GL_VERTEX_SHADER);
 
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

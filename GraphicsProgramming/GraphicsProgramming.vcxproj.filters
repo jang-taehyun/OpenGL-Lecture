@@ -6,4 +6,12 @@
     <ClCompile Include="test.cpp" />
     <ClCompile Include="tessellation보간.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="pinWheel_vs.glsl" />
+    <None Include="stick_vs.glsl" />
+    <None Include="stick_ps.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="pinWheel_ps.glsl" />
+  </ItemGroup>
 </Project>
