@@ -1,3 +1,9 @@
+/*
+다양한 좌표 변환이 필요한 이유 : ndc 공간에서 작업하기 불편하기 때문에, 작업 공간마다 좌표계를 다르게 하여 작업한다.
+clip space : 동차좌표계에서 w로 나눈 coordinate / view volume에 투영된 space
+OpenGL은 NDC만 쓴다 -> 나머지 좌표계는 쓰지 않음
+*/
+
 #include <sb7.h>
 #include <vmath.h>
 #include <shader.h>
@@ -94,7 +100,7 @@ public:
 		glVertexAttrib4fv(3, v2);
 		glVertexAttrib4fv(4, v3);
 		glUseProgram(RenderingProgramStick);
-		glDrawArrays(GL_TRIANGLES, 0, 12);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// draw stick : down
 		v1 = vmath::vec4(0.01f, 0.f, 0.5f, 1.f);
@@ -107,7 +113,7 @@ public:
 		glVertexAttrib4fv(3, v2);
 		glVertexAttrib4fv(4, v3);
 		glUseProgram(RenderingProgramStick);
-		glDrawArrays(GL_TRIANGLES, 0, 12);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// deactive shader program //
 		glUseProgram(0);
@@ -123,8 +129,8 @@ public:
 
 		// draw wing : top //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.f, 0.5f, 0.5f, 1.f };
-		v3 = { -0.5f, 0.5f, 0.5f, 1.f };
+		v2 = { 0.f, 0.25f, 0.5f, 1.f };
+		v3 = { -0.25f, 0.25f, 0.5f, 1.f };
 
 		glVertexAttrib4fv(0, wingsColor);
 		glVertexAttrib1f(1, (float)currentTime);
@@ -136,8 +142,8 @@ public:
 
 		// draw wing : left //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { -0.5f, 0.f, 0.5f, 1.f };
-		v3 = { -0.5f, -0.5f, 0.5f, 1.f };
+		v2 = { -0.25f, 0.f, 0.5f, 1.f };
+		v3 = { -0.25f, -0.25f, 0.5f, 1.f };
 
 		glVertexAttrib4fv(0, wingsColor);
 		glVertexAttrib1f(1, (float)currentTime);
@@ -149,8 +155,8 @@ public:
 
 		// draw wing : down //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.f, -0.5f, 0.5f, 1.f };
-		v3 = { 0.5f, -0.5f, 0.5f, 1.f };
+		v2 = { 0.f, -0.25f, 0.5f, 1.f };
+		v3 = { 0.25f, -0.25f, 0.5f, 1.f };
 
 		glVertexAttrib4fv(0, wingsColor);
 		glVertexAttrib1f(1, (float)currentTime);
@@ -162,8 +168,8 @@ public:
 
 		// draw wing : right //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.5f, 0.f, 0.5f, 1.f };
-		v3 = { 0.5f, 0.5f, 0.5f, 1.f };
+		v2 = { 0.25f, 0.f, 0.5f, 1.f };
+		v3 = { 0.25f, 0.25f, 0.5f, 1.f };
 
 		glVertexAttrib4fv(0, wingsColor);
 		glVertexAttrib1f(1, (float)currentTime);

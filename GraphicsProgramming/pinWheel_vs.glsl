@@ -55,11 +55,13 @@ void main()
 	translate[0] = vec4(1.f, 0.f, 0.f, 0.f);
 	translate[1] = vec4(0.f, 1.f, 0.f, 0.f),
 	translate[2] = vec4(0.f, 0.f, 1.f, 0.f);
-	translate[3] = vec4(sin(ct) * 0.6f, 0.f, 0.f, 1.f);
+	translate[3] = vec4(sin(ct) * 0.8f, 0.f, 0.f, 1.f);
 
-	const vec4 vertices[3] = vec4[3](v1, rotate * v2, rotate * v3);	
+	mat4 transMat = perspectiveProjectionMat * LookAtMat * translate;
 
-	gl_Position = perspectiveProjectionMat * LookAtMat * translate * vertices[gl_VertexID];
+	const vec4 vertices[3] = vec4[3](v1, rotate * v2, rotate * v3);
+
+	gl_Position = transMat * vertices[gl_VertexID];
 
 	vec4 tmp_color[3] = vec4[3](						
 							vec4(color[0], 0.f, 0.f, 1.f),
