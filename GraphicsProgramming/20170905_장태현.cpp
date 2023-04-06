@@ -10,6 +10,8 @@ private:
 	GLuint VertexArrayObject;			// vertex array object(VAO)
 
 public:
+	tmp() : RenderingProgramWings(0), RenderingProgramStick(0), VertexArrayObject(0) {}
+
 	GLuint CompileShaderWings()
 	{
 		GLuint vertexShader;
@@ -66,6 +68,9 @@ public:
 	// rendering loop
 	virtual void render(double currentTime)
 	{
+		glFrontFace(GL_FRONT);
+		glCullFace(GL_BACK);
+
 		vmath::vec4 v1;
 		vmath::vec4 v2;
 		vmath::vec4 v3;
@@ -87,7 +92,7 @@ public:
 		v3 = vmath::vec4(-0.01f, -0.8f, 0.5f, 1.f);
 
 		glVertexAttrib4fv(0, stickColor);
-		glVertexAttrib1f(1, (double)currentTime);
+		glVertexAttrib1f(1, (float)currentTime);
 		glVertexAttrib4fv(2, v1);
 		glVertexAttrib4fv(3, v2);
 		glVertexAttrib4fv(4, v3);
@@ -100,7 +105,7 @@ public:
 		v3 = vmath::vec4(0.01f, -0.8f, 0.5f, 1.f);
 
 		glVertexAttrib4fv(0, stickColor);
-		glVertexAttrib1f(1, (double)currentTime);
+		glVertexAttrib1f(1, (float)currentTime);
 		glVertexAttrib4fv(2, v1);
 		glVertexAttrib4fv(3, v2);
 		glVertexAttrib4fv(4, v3);
@@ -111,7 +116,7 @@ public:
 		glUseProgram(0);
 
 		// ---------- draw wings ---------- //
-		// define wing's color
+		// define wing's color //
 		const GLfloat wingsColor[] = {
 								  (float)sin(currentTime) * (float)cos(currentTime) * 0.5f + 0.5,		// R
 								  (float)sin(currentTime) * 0.5f + 0.5f,								// G
@@ -119,7 +124,7 @@ public:
 								  1.f																	// A
 		};
 
-		// draw wing : top
+		// draw wing : top //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
 		v2 = { 0.f, 0.5f, 0.5f, 1.f };
 		v3 = { -0.5f, 0.5f, 0.5f, 1.f };
@@ -132,7 +137,7 @@ public:
 		glUseProgram(RenderingProgramWings);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		// draw wing : left
+		// draw wing : left //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
 		v2 = { -0.5f, 0.f, 0.5f, 1.f };
 		v3 = { -0.5f, -0.5f, 0.5f, 1.f };
@@ -145,7 +150,7 @@ public:
 		glUseProgram(RenderingProgramWings);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		// draw wing : down
+		// draw wing : down //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
 		v2 = { 0.f, -0.5f, 0.5f, 1.f };
 		v3 = { 0.5f, -0.5f, 0.5f, 1.f };
@@ -158,7 +163,7 @@ public:
 		glUseProgram(RenderingProgramWings);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		// draw wing : right
+		// draw wing : right //
 		v1 = { 0.f, 0.f, 0.5f, 1.f };
 		v2 = { 0.5f, 0.f, 0.5f, 1.f };
 		v3 = { 0.5f, 0.5f, 0.5f, 1.f };
