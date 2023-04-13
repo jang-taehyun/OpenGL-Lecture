@@ -141,15 +141,34 @@ public:
 		// active shader program
 		glUseProgram(ShaderProgram);
 
+		// define matrix //
 		// define rotate matrix about z axis
 		float angle = currentTime * 50.f;
-		vmath::mat4 RotateMat = vmath::rotate(angle, 1.f, 1.f, 1.f);
+		vmath::mat4 RotateMat = vmath::rotate(angle, 0.f, 1.f, 1.f);
+		// define scale matrix
+		vmath::mat4 ScaleMat = vmath::scale((float)0.2);
+		// define translate matrix about sin(currentTime)
+		float moveDistance = (sin(currentTime) / 2.f);
+		vmath::mat4 TranslateMat = vmath::translate(moveDistance, moveDistance, 0.f);
+
+
+		// connet uniform variable to matrix //
 
 		// get uniform variable 'rotMat' location
 		GLint RotMatLocation = glGetUniformLocation(ShaderProgram, "rotMat");
-
 		// deliver to 'rotMat' variable
 		glUniformMatrix4fv(RotMatLocation, 1, GL_FALSE, RotateMat);
+
+		// get uniform variable 'transMat' location
+		GLint TransMatLocation = glGetUniformLocation(ShaderProgram, "transMat");
+		// deliver to 'transMat' variable
+		glUniformMatrix4fv(TransMatLocation, 1, GL_FALSE, TranslateMat);
+
+		// get uniform variable 'scale' location
+		GLint ScaleMatLocation = glGetUniformLocation(ShaderProgram, "scaleMat");
+		// deliver to 'transMat' variable
+		glUniformMatrix4fv(ScaleMatLocation, 1, GL_FALSE, ScaleMat);
+
 
 		// bind VAO
 		glBindVertexArray(VertexArrayObject);
@@ -159,7 +178,6 @@ public:
 
 		// unbind VAO
 		glBindVertexArray(0);
-
 		// deactive shader program
 		glUseProgram(0);
 	}

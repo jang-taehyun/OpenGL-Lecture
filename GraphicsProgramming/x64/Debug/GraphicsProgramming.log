@@ -2,5 +2,6 @@
   test.cpp
 D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\include\sb7.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
 D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\include\vmath.h(1022,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\GraphicsProgramming\test.cpp(145,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\GraphicsProgramming\test.cpp(146,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\GraphicsProgramming\test.cpp(151,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   GraphicsProgramming.vcxproj -> D:\4학년 1학기\그래픽스프로그래밍및실습\GraphicsProgramming\x64\Debug\_myApp_.exe
