@@ -56,13 +56,13 @@ public:
 
 							// back-upward
 							0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
-							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v3 position and color
 
 							// back-downward
 							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
-							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
 
 							// up-upward
 							0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v1 position and color
@@ -76,12 +76,12 @@ public:
 
 							// down-upward
 							0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
-							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
-							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
 
 							// down-downward
-							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
-							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
 							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
 
 							// left-upward
@@ -126,9 +126,9 @@ public:
 	// rendering loop
 	virtual void render(double currentTime)
 	{
-		 // glFrontFace(GL_CCW);
-		 glEnable(GL_CULL_FACE);
-		 // glCullFace(GL_BACK);
+		  glFrontFace(GL_CCW);
+		  glEnable(GL_CULL_FACE);
+		  glCullFace(GL_BACK);
 
 		// clean framebuffer
 		const GLfloat background[] = { 0.f,		// R
