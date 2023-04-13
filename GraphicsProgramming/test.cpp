@@ -1,9 +1,3 @@
-/*
-다양한 좌표 변환이 필요한 이유 : ndc 공간에서 작업하기 불편하기 때문에, 작업 공간마다 좌표계를 다르게 하여 작업한다.
-clip space : 동차좌표계에서 w로 나눈 coordinate / view volume에 투영된 space
-OpenGL은 NDC만 쓴다 -> 나머지 좌표계는 쓰지 않음
-*/
-
 #include <sb7.h>
 #include <vmath.h>
 #include <shader.h>
@@ -11,41 +5,20 @@ OpenGL은 NDC만 쓴다 -> 나머지 좌표계는 쓰지 않음
 class tmp : public sb7::application
 {
 private:
-	GLuint RenderingProgramWings;		// shader program
-	GLuint RenderingProgramStick;
+	GLuint ShaderProgram;				// shader program
 	GLuint VertexArrayObject;			// vertex array object(VAO)
+	GLuint VertexBufferObject;			// vertex buffer object(VBO)
 
 public:
-	tmp() : RenderingProgramWings(0), RenderingProgramStick(0), VertexArrayObject(0) {}
+	tmp() : ShaderProgram(0), VertexBufferObject(0), VertexArrayObject(0) {}
 
-	GLuint CompileShaderWings()
+	GLuint CompileShader()
 	{
 		GLuint vertexShader;
 		GLuint fragmentShader;
 
-		vertexShader = sb7::shader::load("./pinWheel_vs.glsl", GL_VERTEX_SHADER);
-		fragmentShader = sb7::shader::load("./pinWheel_ps.glsl", GL_FRAGMENT_SHADER);
-
-		GLuint shaderProgram;
-		shaderProgram = glCreateProgram();
-
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-
-		glLinkProgram(shaderProgram);
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-		return shaderProgram;
-	}
-	GLuint CompileShaderStick()
-	{
-		GLuint vertexShader;
-		GLuint fragmentShader;
-
-		vertexShader = sb7::shader::load("./stick_vs.glsl", GL_VERTEX_SHADER);
-		fragmentShader = sb7::shader::load("./stick_ps.glsl", GL_FRAGMENT_SHADER);
+		vertexShader = sb7::shader::load("./test_vs.glsl", GL_VERTEX_SHADER);
+		fragmentShader = sb7::shader::load("./test_fs.glsl", GL_FRAGMENT_SHADER);
 
 		GLuint shaderProgram;
 		shaderProgram = glCreateProgram();
@@ -64,20 +37,100 @@ public:
 	// application initialize
 	virtual void startup()
 	{
-		RenderingProgramWings = CompileShaderWings();
-		RenderingProgramStick = CompileShaderStick();
+		ShaderProgram = CompileShader();
 
 		glGenVertexArrays(1, &VertexArrayObject);
 		glBindVertexArray(VertexArrayObject);
+
+		// define cube position and color
+		const GLfloat vertices[] = {
+							// front-upward
+							0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,			// v1 position and color
+							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+
+							// front-downward
+							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
+							-0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+
+							// back-upward
+							0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
+							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+
+							// back-downward
+							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
+							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+
+							// up-upward
+							0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							-0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v3 position and color
+
+							// up-downward
+							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v1 position and color
+							-0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+
+							// down-upward
+							0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+
+							// down-downward
+							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+
+							// left-upward
+							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v1 position and color
+							0.25f, -0.25f, 0.25f, 0.f, 0.f, 1.f,		// v2 position and color
+							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v3 position and color
+
+							// left-downward
+							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v1 position and color
+							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v2 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
+
+							// right-upward
+							-0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,		// v1 position and color
+							-0.25f, -0.25f, 0.25f, 0.f, 0.f, 1.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
+
+							// right-downward
+							-0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,		// v1 position and color
+							-0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v2 position and color
+							-0.25f, 0.25f, -0.25f, 0.f, 0.f, 1.f		// v3 position and color
+		};
+
+		// generate VBO and move data to VBO
+		glGenBuffers(1, &VertexBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		// define connecting setting and connect VBO to vertex attributes
+		// position
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
+		glEnableVertexAttribArray(0);
+		// color
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+		// unbind VBO and VAO
+		glBindBuffer(GL_ARRAY_BUFFER, 0);		// VBO unbind
+		glBindVertexArray(0);					// VAO unbind
 	}
 
 	// rendering loop
 	virtual void render(double currentTime)
 	{
-		vmath::vec4 v1;
-		vmath::vec4 v2;
-		vmath::vec4 v3;
+		 // glFrontFace(GL_CCW);
+		 glEnable(GL_CULL_FACE);
+		 // glCullFace(GL_BACK);
 
+		// clean framebuffer
 		const GLfloat background[] = { 0.f,		// R
 									   0.f,		// G
 									   0.f,		// B
@@ -85,109 +138,36 @@ public:
 		};
 		glClearBufferfv(GL_COLOR, 0, background);
 
-		// ---------- draw stick ---------- //
-		// define stick's color
-		const GLfloat stickColor[] = { 1.f, 1.f, 0.f, 1.f };
+		// active shader program
+		glUseProgram(ShaderProgram);
 
-		// draw stick : top
-		v1 = vmath::vec4(0.01f, 0.f, 0.5f, 1.f);
-		v2 = vmath::vec4(-0.01f, 0.f, 0.5f, 1.f);
-		v3 = vmath::vec4(-0.01f, -0.8f, 0.5f, 1.f);
+		// define rotate matrix about z axis
+		float angle = currentTime * 50.f;
+		vmath::mat4 RotateMat = vmath::rotate(angle, 1.f, 1.f, 1.f);
 
-		glVertexAttrib4fv(0, stickColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramStick);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// get uniform variable 'rotMat' location
+		GLint RotMatLocation = glGetUniformLocation(ShaderProgram, "rotMat");
 
-		// draw stick : down
-		v1 = vmath::vec4(0.01f, 0.f, 0.5f, 1.f);
-		v2 = vmath::vec4(-0.01f, -0.8f, 0.5f, 1.f);
-		v3 = vmath::vec4(0.01f, -0.8f, 0.5f, 1.f);
+		// deliver to 'rotMat' variable
+		glUniformMatrix4fv(RotMatLocation, 1, GL_FALSE, RotateMat);
 
-		glVertexAttrib4fv(0, stickColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramStick);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// bind VAO
+		glBindVertexArray(VertexArrayObject);
 
-		// deactive shader program //
-		glUseProgram(0);
+		// render
+		glDrawArrays(GL_TRIANGLES, 0, 3 * 2 * 6);
 
-		// ---------- draw wings ---------- //
-		// define wing's color //
-		const GLfloat wingsColor[] = {
-								  (float)sin(currentTime) * (float)cos(currentTime) * 0.5f + 0.5,		// R
-								  (float)sin(currentTime) * 0.5f + 0.5f,								// G
-								  (float)cos(currentTime) * 0.5f + 0.5f,								// B
-								  1.f																	// A
-		};
+		// unbind VAO
+		glBindVertexArray(0);
 
-		// draw wing : top //
-		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.f, 0.25f, 0.5f, 1.f };
-		v3 = { -0.25f, 0.25f, 0.5f, 1.f };
-
-		glVertexAttrib4fv(0, wingsColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramWings);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		// draw wing : left //
-		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { -0.25f, 0.f, 0.5f, 1.f };
-		v3 = { -0.25f, -0.25f, 0.5f, 1.f };
-
-		glVertexAttrib4fv(0, wingsColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramWings);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		// draw wing : down //
-		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.f, -0.25f, 0.5f, 1.f };
-		v3 = { 0.25f, -0.25f, 0.5f, 1.f };
-
-		glVertexAttrib4fv(0, wingsColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramWings);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		// draw wing : right //
-		v1 = { 0.f, 0.f, 0.5f, 1.f };
-		v2 = { 0.25f, 0.f, 0.5f, 1.f };
-		v3 = { 0.25f, 0.25f, 0.5f, 1.f };
-
-		glVertexAttrib4fv(0, wingsColor);
-		glVertexAttrib1f(1, (float)currentTime);
-		glVertexAttrib4fv(2, v1);
-		glVertexAttrib4fv(3, v2);
-		glVertexAttrib4fv(4, v3);
-		glUseProgram(RenderingProgramWings);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		// deactive shader program //
+		// deactive shader program
 		glUseProgram(0);
 	}
 
 	virtual void shutdown()
 	{
 		glDeleteVertexArrays(1, &VertexArrayObject);
-		glDeleteProgram(RenderingProgramWings);
-		glDeleteProgram(RenderingProgramStick);
+		glDeleteProgram(ShaderProgram);
 	}
 };
 

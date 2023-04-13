@@ -10,6 +10,10 @@
     <None Include="pinWheel_vs.glsl" />
     <None Include="stick_vs.glsl" />
     <None Include="stick_ps.glsl" />
+    <None Include="vs.glsl" />
+    <None Include="fs.glsl" />
+    <None Include="test_vs.glsl" />
+    <None Include="test_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="pinWheel_ps.glsl" />
