@@ -1,3 +1,10 @@
+/*
+* 하드코딩의 단점 : mesh마다 다른 program을 만들어야 하기때문에 비효율적이다.
+* vertex attribute는 fragment shader에서 접근 불가능
+* 
+* VAO는 설정만 저장하고, VBO는 변경된 data를 저장한다.
+*/
+
 #include <sb7.h>
 #include <vmath.h>
 #include <shader.h>

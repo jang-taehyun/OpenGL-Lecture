@@ -47,62 +47,62 @@ public:
 							// front-upward
 							0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,			// v1 position and color
 							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v3 position and color
 
 							// front-downward
 							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
-							-0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							0.25f, 0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v2 position and color
+							0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v3 position and color
 
-							// back-upward
-							0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
-							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							// right-upward
+							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v1 position and color
+							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v2 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
 
-							// back-downward
-							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 0.f,		// v1 position and color
-							0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v2 position and color
-							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 0.f,		// v3 position and color
+							// right-downward
+							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v1 position and color
+							0.25f, -0.25f, 0.25f, 0.f, 0.f, 1.f,		// v2 position and color
+							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
 
 							// up-upward
-							0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v1 position and color
-							-0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v2 position and color
-							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v3 position and color
+							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,			// v3 position and color
 
 							// up-downward
 							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v1 position and color
-							-0.25f, -0.25f, 0.25f, 0.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
 							-0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,		// v3 position and color
 
-							// down-upward
-							0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
-							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
-							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+							// back-upward
+							-0.25f, 0.25f, -0.25f, 1.f, 1.f, 0.f,		// v1 position and color
+							0.25f, 0.25f, -0.25f, 1.f, 1.f, 0.f,		// v2 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 1.f, 0.f,		// v3 position and color
 
-							// down-downward
-							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 0.f,		// v1 position and color
-							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
-							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
+							// back-downward
+							-0.25f, 0.25f, -0.25f, 1.f, 1.f, 0.f,		// v1 position and color
+							0.25f, -0.25f, -0.25f, 1.f, 1.f, 0.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 1.f, 1.f, 0.f,		// v3 position and color
 
 							// left-upward
-							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v1 position and color
-							0.25f, -0.25f, 0.25f, 0.f, 0.f, 1.f,		// v2 position and color
-							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v3 position and color
+							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 1.f,		// v1 position and color
+							-0.25f, 0.25f, -0.25f, 1.f, 0.f, 1.f,		// v2 position and color
+							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 1.f,		// v3 position and color
 
 							// left-downward
-							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v1 position and color
-							0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,			// v2 position and color
-							0.25f, 0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
+							-0.25f, 0.25f, 0.25f, 1.f, 0.f, 1.f,		// v1 position and color
+							-0.25f, -0.25f, -0.25f, 1.f, 0.f, 1.f,		// v2 position and color
+							-0.25f, -0.25f, 0.25f, 1.f, 0.f, 1.f,		// v3 position and color
 
-							// right-upward
-							-0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,		// v1 position and color
-							-0.25f, -0.25f, 0.25f, 0.f, 0.f, 1.f,		// v2 position and color
-							-0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
+							// down-upward
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 1.f,		// v1 position and color
+							0.25f, -0.25f, -0.25f, 0.f, 1.f, 1.f,		// v2 position and color
+							0.25f, -0.25f, 0.25f, 0.f, 1.f, 1.f,		// v3 position and color
 
-							// right-downward
-							-0.25f, 0.25f, 0.25f, 0.f, 0.f, 1.f,		// v1 position and color
-							-0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v2 position and color
-							-0.25f, 0.25f, -0.25f, 0.f, 0.f, 1.f		// v3 position and color
+							// down-downward
+							-0.25f, -0.25f, -0.25f, 0.f, 1.f, 1.f,		// v1 position and color
+							0.25f, -0.25f, 0.25f, 0.f, 1.f, 1.f,		// v2 position and color
+							-0.25f, -0.25f, 0.25f, 0.f, 1.f, 1.f		// v3 position and color
 		};
 
 		// generate VBO and move data to VBO
@@ -126,9 +126,7 @@ public:
 	// rendering loop
 	virtual void render(double currentTime)
 	{
-		  glFrontFace(GL_CCW);
-		  glEnable(GL_CULL_FACE);
-		  glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
 
 		// clean framebuffer
 		const GLfloat background[] = { 0.f,		// R
@@ -142,33 +140,32 @@ public:
 		glUseProgram(ShaderProgram);
 
 		// define matrix //
-		// define rotate matrix about z axis
+		// define rotate matrix about xyz axis
 		float angle = currentTime * 50.f;
-		vmath::mat4 RotateMat = vmath::rotate(angle, 0.f, 1.f, 1.f);
-		// define scale matrix
-		vmath::mat4 ScaleMat = vmath::scale((float)0.2);
+		vmath::mat4 RotateMat = vmath::rotate(angle, 0.f, 1.f, 0.f);
 		// define translate matrix about sin(currentTime)
-		float moveDistance = (sin(currentTime) / 2.f);
-		vmath::mat4 TranslateMat = vmath::translate(moveDistance, moveDistance, 0.f);
+		float moveDistanceX = sin(currentTime);
+		float moveDistanceY = 0.f;
+		float moveDistanceZ = cos(currentTime);
+		vmath::mat4 TranslateMat = vmath::translate(moveDistanceX, moveDistanceY, moveDistanceZ);
+		// define view matrix
+		vmath::mat4 ViewMat = vmath::lookat(
+										vmath::vec3(0.f, 1.f, 2.f),
+										vmath::vec3(0.f, 0.f, 0.f),
+										vmath::vec3(0.f, 1.f, 0.f)
+		);
+		// define projection matrix about camera
+		vmath::mat4 projectionMat = vmath::perspective(50.0f, info.windowWidth / info.windowHeight, 0.1f, 1000.0f);
 
+		// calculate transMat
+		vmath::mat4 TransMat = projectionMat * ViewMat * TranslateMat * RotateMat;
 
 		// connet uniform variable to matrix //
-
-		// get uniform variable 'rotMat' location
-		GLint RotMatLocation = glGetUniformLocation(ShaderProgram, "rotMat");
-		// deliver to 'rotMat' variable
-		glUniformMatrix4fv(RotMatLocation, 1, GL_FALSE, RotateMat);
 
 		// get uniform variable 'transMat' location
 		GLint TransMatLocation = glGetUniformLocation(ShaderProgram, "transMat");
 		// deliver to 'transMat' variable
-		glUniformMatrix4fv(TransMatLocation, 1, GL_FALSE, TranslateMat);
-
-		// get uniform variable 'scale' location
-		GLint ScaleMatLocation = glGetUniformLocation(ShaderProgram, "scaleMat");
-		// deliver to 'transMat' variable
-		glUniformMatrix4fv(ScaleMatLocation, 1, GL_FALSE, ScaleMat);
-
+		glUniformMatrix4fv(TransMatLocation, 1, GL_FALSE, TransMat);
 
 		// bind VAO
 		glBindVertexArray(VertexArrayObject);
