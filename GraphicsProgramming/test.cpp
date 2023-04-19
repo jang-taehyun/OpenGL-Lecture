@@ -65,9 +65,9 @@ public:
 							0.25f, -0.25f, -0.25f, 0.f, 0.f, 1.f,		// v3 position and color
 
 							// up-upward
-							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,		// v1 position and color
+							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v1 position and color
 							0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v2 position and color
-							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,			// v3 position and color
+							-0.25f, 0.25f, -0.25f, 0.f, 1.f, 0.f,		// v3 position and color
 
 							// up-downward
 							0.25f, 0.25f, 0.25f, 0.f, 1.f, 0.f,			// v1 position and color
@@ -150,7 +150,7 @@ public:
 		vmath::mat4 TranslateMat = vmath::translate(moveDistanceX, moveDistanceY, moveDistanceZ);
 		// define view matrix
 		vmath::mat4 ViewMat = vmath::lookat(
-										vmath::vec3(0.f, 1.f, 2.f),
+										vmath::vec3(0.f, -1.f, 3.f),
 										vmath::vec3(0.f, 0.f, 0.f),
 										vmath::vec3(0.f, 1.f, 0.f)
 		);
