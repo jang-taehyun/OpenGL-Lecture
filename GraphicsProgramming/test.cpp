@@ -1,3 +1,8 @@
+/*
+* 3d object 1개에 여러 VAO가 들어갈 수 있음
+* VAO 하나에는 여러 VBO가 들어갈 수 있고, render 시에 따로 활성화해주지 않아도 된다.
+*/
+
 #include <sb7.h>
 #include <vmath.h>
 #include <shader.h>

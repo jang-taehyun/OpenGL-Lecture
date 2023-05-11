@@ -15,6 +15,12 @@
     <None Include="stick_ps.glsl" />
     <None Include="stick_vs.glsl" />
     <None Include="vs.glsl" />
+    <None Include="color_fs.glsl" />
+    <None Include="color_vs.glsl" />
+    <None Include="texture_fs.glsl" />
+    <None Include="texture_vs.glsl" />
+    <None Include="simple_color_fs.glsl" />
+    <None Include="simple_color_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h" />

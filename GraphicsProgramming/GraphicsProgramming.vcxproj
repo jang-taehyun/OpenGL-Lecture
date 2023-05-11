@@ -168,13 +168,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="color_fs.glsl" />
+    <None Include="color_vs.glsl" />
     <None Include="fs.glsl" />
     <None Include="pinWheel_ps.glsl" />
     <None Include="pinWheel_vs.glsl" />
+    <None Include="simple_color_fs.glsl" />
+    <None Include="simple_color_vs.glsl" />
     <None Include="stick_ps.glsl" />
     <None Include="stick_vs.glsl" />
     <None Include="test_fs.glsl" />
     <None Include="test_vs.glsl" />
+    <None Include="texture_fs.glsl" />
+    <None Include="texture_vs.glsl" />
     <None Include="vs.glsl" />
   </ItemGroup>
   <ItemGroup>
