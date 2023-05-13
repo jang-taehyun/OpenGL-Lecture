@@ -3,13 +3,16 @@
 #include <vmath.h>
 #include <shader.h>
 #include "stb_image.h"
+#include <vector>
 
 class my_application : public sb7::application
 {
 private:
 	GLuint shader_programs[3];
-	GLuint VAOs[3], VBOs[3], EBO;
+	GLuint VAOs[3], VBOs[3], EBOs[2];
 	GLuint textures[3];
+
+	std::vector<vmath::vec3> boxPositions;
 
 public:
 	GLuint compile_shader(const char* vs_file, const char* fs_file)					// -> *vs_file, *fs_file 변경 가능 && vs_file, fs_file은 변경 불가능
@@ -61,7 +64,7 @@ public:
 		// VAO, VBO, EBO, texture 생성
 		glGenVertexArrays(3, VAOs);
 		glGenBuffers(3, VBOs);
-		glGenBuffers(1, &EBO);
+		glGenBuffers(2, EBOs);
 		glGenTextures(3, textures);
 
 		// 첫 번째 객체 정의 : 바닥 --------------------------------------------------
@@ -97,7 +100,7 @@ public:
 		glEnableVertexAttribArray(2);
 
 		// EBO를 생성하고 indices 값들을 복사
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(floor_indices), floor_indices, GL_STATIC_DRAW);
 
 		// VBO 및 버텍스 속성을 다 했으니 VBO와 VAO를 unbind한다.
@@ -217,70 +220,58 @@ public:
 
 		// light box
 		glBindVertexArray(VAOs[2]);
-		GLfloat Light_vertices[] = {
-			// position			
-			// 뒷면
-			-0.25f, 0.5f, -0.25f,
-			0.25f, 0.0f, -0.25f,
-			-0.25f, 0.0f, -0.25f,
+		// 피라미드 점들의 위치와 컬러, 텍스처 좌표를 정의한다.
+		GLfloat pyramid_vertices[] = {
+			1.0f, 0.0f, -1.0f,    // 우측 상단
+			-1.0f, 0.0f, -1.0f,   // 좌측 상단
+			-1.0f, 0.0f, 1.0f,    // 좌측 하단
+			1.0f, 0.0f, 1.0f,     // 우측 하단
+			0.0f, 1.0f, 0.0f,      // 상단 꼭지점
+			0.0f, -1.0f, 0.0f,      // 하단 꼭지점
+		};
 
-			0.25f, 0.0f, -0.25f,
-			-0.25f, 0.5f, -0.25f,
-			0.25f, 0.5f, -0.25f,
-			// 우측면
-			0.25f, 0.0f, -0.25f,
-			0.25f, 0.5f, -0.25f,
-			0.25f, 0.0f, 0.25f,
+		// 삼각형으로 그릴 인덱스를 정의한다.
+		GLuint pyramid_indices[] = {
+			4, 0, 1,
+			4, 1, 2,
+			4, 2, 3,
+			4, 3, 0,
 
-			0.25f, 0.0f, 0.25f,
-			0.25f, 0.5f, -0.25f,
-			0.25f, 0.5f, 0.25f,
-			// 정면
-			0.25f, 0.0f, 0.25f,
-			0.25f, 0.5f, 0.25f,
-			-0.25f, 0.0f, 0.25f,
-
-			-0.25f, 0.0f, 0.25f,
-			0.25f, 0.5f, 0.25f,
-			-0.25f, 0.5f, 0.25f,
-			// 좌측면
-			-0.25f, 0.0f, 0.25f,
-			-0.25f, 0.5f, 0.25f,
-			-0.25f, 0.0f, -0.25f,
-
-			-0.25f, 0.0f, -0.25f,
-			-0.25f, 0.5f, 0.25f,
-			-0.25f, 0.5f, -0.25f,
-			// 바닥면
-			-0.25f, 0.0f, 0.25f,
-			0.25f, 0.0f, -0.25f,
-			0.25f, 0.0f, 0.25f,
-
-			0.25f, 0.0f, -0.25f,
-			-0.25f, 0.0f, 0.25f,
-			-0.25f, 0.0f, -0.25f,
-			// 윗면
-			-0.25f, 0.5f, -0.25f,
-			0.25f, 0.5f, 0.25f,
-			0.25f, 0.5f, -0.25f,
-
-			0.25f, 0.5f, 0.25f,
-			-0.25f, 0.5f, -0.25f,
-			-0.25f, 0.5f, 0.25f,
+			5, 1, 0,
+			5, 2, 1,
+			5, 3, 2,
+			5, 0, 3,
 		};
 
 		// VBO를 생성하여 vertices 값들을 복사
 		glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Light_vertices), Light_vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
 
 		// VBO를 나누어서 각 버텍스 속성으로 연결
 		// 위치 속성 (location = 0)
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
+		// EBO를 생성하고 indices 값들을 복사
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[1]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(pyramid_indices), pyramid_indices, GL_STATIC_DRAW);
+
 		// VBO 및 버텍스 속성을 다 했으니 VBO와 VAO를 unbind한다.
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		// 박스 10개 포지션 설정
+		boxPositions.push_back(vmath::vec3(0.0f, 0.0f, 0.0f));
+		boxPositions.push_back(vmath::vec3(2.0f, 5.0f, -15.0f));
+		boxPositions.push_back(vmath::vec3(-1.5f, -2.2f, -2.5f));
+		boxPositions.push_back(vmath::vec3(-3.8f, -2.0f, -12.3f));
+		boxPositions.push_back(vmath::vec3(2.4f, -0.4f, -3.5f));
+		boxPositions.push_back(vmath::vec3(-1.7f, 3.0f, -7.5f));
+		boxPositions.push_back(vmath::vec3(1.3f, -2.0f, -2.5f));
+		boxPositions.push_back(vmath::vec3(1.5f, 2.0f, -2.5f));
+		boxPositions.push_back(vmath::vec3(1.5f, 0.2f, -1.5f));
+		boxPositions.push_back(vmath::vec3(-1.3f, 1.0f, -1.5f));
 	}
 
 	// 렌더링 virtual 함수를 작성해서 오버라이딩한다.
@@ -301,24 +292,23 @@ public:
 
 		// 카메라 매트릭스 계산
 		float distance = 2.f;
-		vmath::vec3 eye((float)cos(currentTime * 0.1f) * distance, 1.f, (float)sin(currentTime * 0.1f) * distance);
-		// vmath::vec3 eye(0.f, 2.f, 3.f);
+		vmath::vec3 eye((float)cos(currentTime * 0.1f) * distance, 1.0, (float)sin(currentTime * 0.1f) * distance);
 		vmath::vec3 center(0.0, 0.0, 0.0);
 		vmath::vec3 up(0.0, 1.0, 0.0);
 		vmath::mat4 lookAt = vmath::lookat(eye, center, up);
-		float fov = 50.f;// (float)cos(currentTime)*20.f + 50.0f;
-		vmath::mat4 projM = vmath::perspective(fov, info.windowWidth / info.windowHeight, 0.1f, 1000.0f);
+		float fov = 50.f;
+		vmath::mat4 projM = vmath::perspective(fov, (float)info.windowWidth / info.windowHeight, 0.1f, 1000.0f);
 
 		// 바닥 그리기 ---------------------------------------
-		glUseProgram(shader_programs[0]);
-		glUniformMatrix4fv(uniform_transform1, 1, GL_FALSE, projM * lookAt * vmath::scale(1.5f));
-		glUniform1i(glGetUniformLocation(shader_programs[0], "texture1"), 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textures[0]);
-		glBindVertexArray(VAOs[0]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glUseProgram(shader_programs[0]);
+		//glUniformMatrix4fv(uniform_transform1, 1, GL_FALSE, projM * lookAt * vmath::scale(1.5f));
+		//glUniform1i(glGetUniformLocation(shader_programs[0], "texture1"), 0);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, textures[0]);
+		//glBindVertexArray(VAOs[0]);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+		//glBindTexture(GL_TEXTURE_2D, 0);
 		// 정육면체 그리기 --------------------------------------- 1
 		glUseProgram(shader_programs[1]);
 		glBindVertexArray(VAOs[1]);
@@ -333,9 +323,7 @@ public:
 		vmath::vec3 lightAmbient(0.2f, 0.2f, 0.2f);
 		vmath::vec3 lightDiffuse(0.5f, 0.5f, 0.5f);
 		vmath::vec3 lightSpecular(1.f, 1.f, 1.f);
-		//vmath::vec3 lightPosition(0.5f, 0.3f, 0.5f);
-		distance = 0.5f;
-		vmath::vec3 lightPosition((float)cos(currentTime * 1.f) * distance, 0.3f, (float)sin(currentTime * 1.f) * distance);
+		vmath::vec3 lightPosition(vmath::vec3((float)sin(currentTime * 0.5f), 0.25f, (float)cos(currentTime * 0.5f) * 0.7f));
 
 		// Get lightColor variable's location
 		GLint uniform_transform8 = glGetUniformLocation(shader_programs[1], "viewPos");
@@ -357,7 +345,7 @@ public:
 		vmath::mat4 model_1 = model;
 
 		// link model transform
-		glUniformMatrix4fv(uniform_transform2, 1, GL_FALSE, model_1);
+		// glUniformMatrix4fv(uniform_transform2, 1, GL_FALSE, model_1);
 		glUniformMatrix4fv(uniform_transform3, 1, GL_FALSE, lookAt);
 		glUniformMatrix4fv(uniform_transform4, 1, GL_FALSE, projM);
 		
@@ -382,32 +370,42 @@ public:
 		glUniform3fv(uniform_transform17, 1, lightSpecular);
 		glUniform3fv(uniform_transform7, 1, lightPosition);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (int i = 0; i < boxPositions.size(); i++)
+		{
+			float angle = 20.f * i;
+			vmath::mat4 model = vmath::translate(boxPositions[i]) *
+								vmath::rotate(angle, 1.0f, 0.3f, 0.5f) *
+								vmath::scale(1.0f);
+			glUniformMatrix4fv(uniform_transform2, 1, GL_FALSE, model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		// 광원 그리기 ---------------------------------------
 		glUseProgram(shader_programs[2]);
 		glBindVertexArray(VAOs[2]);
 
-		GLint uniform_transform10 = glGetUniformLocation(shader_programs[2], "color");
-		GLint uniform_transform11 = glGetUniformLocation(shader_programs[2], "model");
-		GLint uniform_transform12 = glGetUniformLocation(shader_programs[2], "view");
-		GLint uniform_transform13 = glGetUniformLocation(shader_programs[2], "projection");
+		float angle = currentTime * 100;
+		float move_y = (float)cos(currentTime) * 0.2f + 0.5f;
+		float scaleFactor = 0.05f;// (float)cos(currentTime)*0.05f + 0.2f;
+		vmath::vec3 lightPos = vmath::vec3((float)sin(currentTime * 0.5f), 0.25f, (float)cos(currentTime * 0.5f) * 0.7f);// (0.0f, 0.5f, 0.0f);
+		vmath::vec3 lightColor(1.0f, 1.0f, 1.0f);
+		vmath::mat4 transform = vmath::translate(lightPos) *
+								vmath::rotate(angle * 0.5f, 0.0f, 1.0f, 0.0f) *
+								vmath::scale(scaleFactor, scaleFactor, scaleFactor);
 
-		vmath::mat4 model_3 = vmath::translate(lightPosition) * model * vmath::scale(0.1f);
+		glUniform3fv(glGetUniformLocation(shader_programs[2], "color"), 1, lightColor);
+		glUniformMatrix4fv(glGetUniformLocation(shader_programs[2], "projection"), 1, GL_FALSE, projM);
+		glUniformMatrix4fv(glGetUniformLocation(shader_programs[2], "view"), 1, GL_FALSE, lookAt);
+		glUniformMatrix4fv(glGetUniformLocation(shader_programs[2], "model"), 1, GL_FALSE, transform);
 
-		glUniform3fv(uniform_transform10, 1, lightSpecular);
-		glUniformMatrix4fv(uniform_transform11, 1, GL_FALSE, model_3);
-		glUniformMatrix4fv(uniform_transform12, 1, GL_FALSE, lookAt);
-		glUniformMatrix4fv(uniform_transform13, 1, GL_FALSE, projM);
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
 	}
 
 	virtual void shutdown()
 	{
 		glDeleteTextures(2, textures);
-		glDeleteBuffers(1, &EBO);
+		glDeleteBuffers(2, EBOs);
 		glDeleteBuffers(3, VBOs);
 		glDeleteVertexArrays(3, VAOs);
 		glDeleteProgram(shader_programs[0]);

@@ -1,14 +1,3 @@
-/*
-* 3d object 1개에 여러 VAO가 들어갈 수 있음
-* VAO 하나에는 여러 VBO가 들어갈 수 있고, render 시에 따로 활성화해주지 않아도 된다.
-* 
-* 정규화 되어 있기 때문에 곱해서 표현할 수 있음
-* diffuse에서 내적을 사용하는 이유 : 빛이 반사되는 각도에 따라 다른 빛의 양을 표현할 수 있기 때문
-* normal vector의 변환이 따로 필요한 이유 : 광원의 위치를 월드 공간 기준으로 정했기 때문
-  -> 다른 space에서 정의되었다면 그 space에 따라 normal vector 변환을 따로 정의한다.
-* normal matrix에서 3*3만 쓰는 이유 : 이동을 제외하기 위해
-*/
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <sb7.h>
 #include <vmath.h>
@@ -20,7 +9,7 @@ class my_application : public sb7::application
 private:
 	GLuint shader_programs[3];
 	GLuint VAOs[3], VBOs[3], EBO;
-	GLuint textures[2];
+	GLuint textures[3];
 
 public:
 	GLuint compile_shader(const char* vs_file, const char* fs_file)					// -> *vs_file, *fs_file 변경 가능 && vs_file, fs_file은 변경 불가능
@@ -39,15 +28,17 @@ public:
 		return program;
 	}
 
-	void load_texture(GLuint textureID, char const* filename)						// -> *filename 변경 불가능 && fileane은 변경 가능
-	{		
+	void load_texture(GLuint textureID, char const* filename, GLenum GL_ColorFormat = GL_RGB, GLenum GL_InputFormat = GL_RGB)						// -> *filename 변경 불가능 && fileane은 변경 가능
+	{
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		int width, height, nrChannels;
 		unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
 
 		if (data) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			// 앞에 format : 넘길 데이터의 채널
+			// 뒤에 format : 
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ColorFormat, width, height, 0, GL_InputFormat, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		stbi_image_free(data);
@@ -55,7 +46,7 @@ public:
 		// 텍스처 샘플링/필터링 설정
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
@@ -64,19 +55,19 @@ public:
 		stbi_set_flip_vertically_on_load(true);
 
 		shader_programs[0] = compile_shader("./texture_vs.glsl", "./texture_fs.glsl");
-		shader_programs[1] = compile_shader("./color_vs.glsl", "./color_fs.glsl");
+		shader_programs[1] = compile_shader("./test_vs.glsl", "./test_fs.glsl");
 		shader_programs[2] = compile_shader("./simple_color_vs.glsl", "./simple_color_fs.glsl");
 
 		// VAO, VBO, EBO, texture 생성
 		glGenVertexArrays(3, VAOs);
 		glGenBuffers(3, VBOs);
 		glGenBuffers(1, &EBO);
-		glGenTextures(2, textures);
+		glGenTextures(3, textures);
 
 		// 첫 번째 객체 정의 : 바닥 --------------------------------------------------
 		glBindVertexArray(VAOs[0]);
 		// 바닥 점들의 위치와 컬러, 텍스처 좌표를 정의한다.
-		float floor_s = 3.0f, floor_t = 3.0f;
+		float floor_s = 5.0f, floor_t = 5.0f;
 		GLfloat floor_vertices[] = {
 			1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, floor_s, floor_t,  // 우측 상단
 			-1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, floor_t,  // 좌측 상단
@@ -114,13 +105,18 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		// 텍스처 객체 만들고 바인딩 (grass)
+		// 텍스처 객체 만들고 바인딩
 		load_texture(textures[0], "../src/wall.jpg");
+		// 텍스처 객체 만들고 바인딩 
+		// load_texture(textures[1], "../src/brick.jpg");
+		load_texture(textures[1], "../src/container2.png", GL_RGBA, GL_RGBA);
+		// 텍스처 객체 만들고 바인딩 
+		load_texture(textures[2], "../src/container2_specular.png", GL_RGBA, GL_RGBA);
 
 		// 두 번째 객체 정의 : 박스 --------------------------------------------------
 		glBindVertexArray(VAOs[1]);
 		// 박스 점들의 위치와 컬러, 텍스처 좌표를 정의한다.
-		float box_s = 1.0f, box_t = 1.0f;
+		float box_s = 1.f, box_t = 1.f;
 		vmath::vec3 vertices[8] = {
 			vmath::vec3(0.25f, 0.5f, 0.25f),		// v0
 			vmath::vec3(-0.25f, 0.5f, 0.25f),		// v1
@@ -219,9 +215,6 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-		// 텍스처 객체 만들고 바인딩 
-		load_texture(textures[1], "../src/brick.jpg");
-
 		// light box
 		glBindVertexArray(VAOs[2]);
 		GLfloat Light_vertices[] = {
@@ -237,18 +230,18 @@ public:
 			// 우측면
 			0.25f, 0.0f, -0.25f,
 			0.25f, 0.5f, -0.25f,
-			0.25f, 0.0f, 0.25f,	
+			0.25f, 0.0f, 0.25f,
 
-			0.25f, 0.0f, 0.25f,	
+			0.25f, 0.0f, 0.25f,
 			0.25f, 0.5f, -0.25f,
-			0.25f, 0.5f, 0.25f,	
+			0.25f, 0.5f, 0.25f,
 			// 정면
-			0.25f, 0.0f, 0.25f,	
-			0.25f, 0.5f, 0.25f,	
+			0.25f, 0.0f, 0.25f,
+			0.25f, 0.5f, 0.25f,
 			-0.25f, 0.0f, 0.25f,
 
 			-0.25f, 0.0f, 0.25f,
-			0.25f, 0.5f, 0.25f,	
+			0.25f, 0.5f, 0.25f,
 			-0.25f, 0.5f, 0.25f,
 			// 좌측면
 			-0.25f, 0.0f, 0.25f,
@@ -261,17 +254,17 @@ public:
 			// 바닥면
 			-0.25f, 0.0f, 0.25f,
 			0.25f, 0.0f, -0.25f,
-			0.25f, 0.0f, 0.25f,	
+			0.25f, 0.0f, 0.25f,
 
 			0.25f, 0.0f, -0.25f,
 			-0.25f, 0.0f, 0.25f,
 			-0.25f, 0.0f, -0.25f,
 			// 윗면
 			-0.25f, 0.5f, -0.25f,
-			0.25f, 0.5f, 0.25f,	
+			0.25f, 0.5f, 0.25f,
 			0.25f, 0.5f, -0.25f,
 
-			0.25f, 0.5f, 0.25f,	
+			0.25f, 0.5f, 0.25f,
 			-0.25f, 0.5f, -0.25f,
 			-0.25f, 0.5f, 0.25f,
 		};
@@ -289,7 +282,7 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
-	
+
 	// 렌더링 virtual 함수를 작성해서 오버라이딩한다.
 	virtual void render(double currentTime)
 	{
@@ -325,44 +318,74 @@ public:
 		glBindVertexArray(VAOs[0]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
 		// 정육면체 그리기 --------------------------------------- 1
 		glUseProgram(shader_programs[1]);
 		glBindVertexArray(VAOs[1]);
 
-		// define light's color, ambientStrength, light's position, shininess
-		vmath::vec3 lightColor(1.f, 1.f, 1.f);
-		GLfloat ambientStrength = 0.1f;
-		vmath::vec3 lightPos(0.f, 0.f, 0.f);
-		int shininess = 64;
-		// vmath::vec3 lightPos((float)cos(currentTime * 0.1f) * distance, 1.f, (float)sin(currentTime * 0.1f) * distance);
+		// define object's ambient, diffuse, specular, shininess
+		vmath::vec3 ambient(1.f, 0.5f, 0.31f);
+		vmath::vec3 diffuse(1.f, 0.5f, 0.31f);
+		vmath::vec3 specular(0.5f, 0.5f, 0.5f);
+		int shininess = 32;
+
+		// define light's ambient, diffuse, shininess, position
+		vmath::vec3 lightAmbient(0.2f, 0.2f, 0.2f);
+		vmath::vec3 lightDiffuse(0.5f, 0.5f, 0.5f);
+		vmath::vec3 lightSpecular(1.f, 1.f, 1.f);
+		//vmath::vec3 lightPosition(0.5f, 0.3f, 0.5f);
+		distance = 0.5f;
+		vmath::vec3 lightPosition((float)cos(currentTime * 1.f) * distance, 0.3f, (float)sin(currentTime * 1.f) * distance);
+
 		// Get lightColor variable's location
-		GLint uniform_transform5 = glGetUniformLocation(shader_programs[1], "lightColor");
-		GLint uniform_transform6 = glGetUniformLocation(shader_programs[1], "ambientStrength");
-		GLint uniform_transform7 = glGetUniformLocation(shader_programs[1], "lightPos");
 		GLint uniform_transform8 = glGetUniformLocation(shader_programs[1], "viewPos");
-		GLint uniform_transform9 = glGetUniformLocation(shader_programs[1], "shininess");
+
+		//GLint uniform_transform6 = glGetUniformLocation(shader_programs[1], "material.ambient");
+		//GLint uniform_transform9 = glGetUniformLocation(shader_programs[1], "material.diffuse");
+		GLint uniform_transform18 = glGetUniformLocation(shader_programs[1], "material.diffuse");
+		GLint uniform_transform14 = glGetUniformLocation(shader_programs[1], "material.specular");
+		GLint uniform_transform15 = glGetUniformLocation(shader_programs[1], "material.shininess");
+
+		GLint uniform_transform5 = glGetUniformLocation(shader_programs[1], "light.ambient");
+		GLint uniform_transform16 = glGetUniformLocation(shader_programs[1], "light.diffuse");
+		GLint uniform_transform17 = glGetUniformLocation(shader_programs[1], "light.specular");
+		GLint uniform_transform7 = glGetUniformLocation(shader_programs[1], "light.position");
 
 		// define model translation
 		vmath::mat4 model = vmath::rotate((float)currentTime * 50.f, 0.f, 1.f, 0.f);
-		vmath::mat4 model_1 = vmath::translate(1.f, 0.f, 0.f) * model;
-		
+		// vmath::mat4 model_1 = vmath::translate(1.f, 0.f, 0.f) * model;
+		vmath::mat4 model_1 = model;
+
+		// link model transform
 		glUniformMatrix4fv(uniform_transform2, 1, GL_FALSE, model_1);
 		glUniformMatrix4fv(uniform_transform3, 1, GL_FALSE, lookAt);
 		glUniformMatrix4fv(uniform_transform4, 1, GL_FALSE, projM);
-		glUniform3fv(uniform_transform5, 1, lightColor);
-		glUniform1f(uniform_transform6, ambientStrength);
-		glUniform3fv(uniform_transform7, 1, lightPos);
+
+		// link camera position
 		glUniform3fv(uniform_transform8, 1, eye);
-		glUniform1i(uniform_transform9, shininess);
+
+		// link object's material
+		//glUniform3fv(uniform_transform6, 1, ambient);
+		//glUniform3fv(uniform_transform9, 1, diffuse);
+		glUniform1i(uniform_transform18, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[1]);
+		//glUniform3fv(uniform_transform14, 1, specular);
+		glUniform1i(uniform_transform14, 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textures[2]);
+		glUniform1i(uniform_transform15, shininess);
+
+		// link light' material
+		glUniform3fv(uniform_transform5, 1, lightAmbient);
+		glUniform3fv(uniform_transform16, 1, lightDiffuse);
+		glUniform3fv(uniform_transform17, 1, lightSpecular);
+		glUniform3fv(uniform_transform7, 1, lightPosition);
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		// 정육면체 그리기 --------------------------------------- 2
-		shininess = 1;
-		vmath::mat4 model_2 = vmath::translate(-1.f, 0.f, 0.f) * model;
-		glUniformMatrix4fv(uniform_transform2, 1, GL_FALSE, model_2);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		// 정육면체 그리기 --------------------------------------- 3
+		glBindTexture(GL_TEXTURE_2D, 0);
+		// 광원 그리기 ---------------------------------------
 		glUseProgram(shader_programs[2]);
 		glBindVertexArray(VAOs[2]);
 
@@ -371,9 +394,9 @@ public:
 		GLint uniform_transform12 = glGetUniformLocation(shader_programs[2], "view");
 		GLint uniform_transform13 = glGetUniformLocation(shader_programs[2], "projection");
 
-		vmath::mat4 model_3 = vmath::translate(lightPos) * model * vmath::scale(0.1f);
+		vmath::mat4 model_3 = vmath::translate(lightPosition) * model * vmath::scale(0.1f);
 
-		glUniform3fv(uniform_transform10, 1, lightColor);
+		glUniform3fv(uniform_transform10, 1, lightSpecular);
 		glUniformMatrix4fv(uniform_transform11, 1, GL_FALSE, model_3);
 		glUniformMatrix4fv(uniform_transform12, 1, GL_FALSE, lookAt);
 		glUniformMatrix4fv(uniform_transform13, 1, GL_FALSE, projM);
@@ -385,10 +408,11 @@ public:
 	{
 		glDeleteTextures(2, textures);
 		glDeleteBuffers(1, &EBO);
-		glDeleteBuffers(2, VBOs);
-		glDeleteVertexArrays(2, VAOs);
+		glDeleteBuffers(3, VBOs);
+		glDeleteVertexArrays(3, VAOs);
 		glDeleteProgram(shader_programs[0]);
 		glDeleteProgram(shader_programs[1]);
+		glDeleteProgram(shader_programs[2]);
 	}
 };
 
