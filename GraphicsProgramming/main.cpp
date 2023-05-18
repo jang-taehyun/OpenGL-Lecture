@@ -1,9 +1,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 //#define DIRECTIONAL_LIGHT
-#define POINT_LIGHT
+//#define POINT_LIGHT
 //#define SPOT_LIGHT
-//#define MULTIPLE_LIGHT
+#define MULTIPLE_LIGHT
 
 #include <sb7.h>
 #include <vmath.h>

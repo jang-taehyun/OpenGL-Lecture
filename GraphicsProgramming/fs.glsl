@@ -1,9 +1,9 @@
 #version 430 core
 
-//#define MULTIPLE_LIGHT
-#define SEVERAL
+#define MULTIPLE_LIGHT
+//#define SEVERAL
 //#define DIRECTIONAL_LIGHT
-#define POINT_LIGHT
+//#define POINT_LIGHT
 //#define SPOT_LIGHT
 
 // -------------------- several lighting -------------------- //
