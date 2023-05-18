@@ -1,9 +1,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 //#define DIRECTIONAL_LIGHT
-//#define POINT_LIGHT
+#define POINT_LIGHT
 //#define SPOT_LIGHT
-#define MULTIPLE_LIGHT
+//#define MULTIPLE_LIGHT
 
 #include <sb7.h>
 #include <vmath.h>
@@ -382,8 +382,8 @@ public:
 
 #ifdef MULTIPLE_LIGHT
 		vmath::vec3 pointLightPos[2] = {
-			vmath::vec3((float)sin(currentTime * 0.5f), 0.25f, (float)cos(currentTime * 0.5f) * 0.7f),
-			vmath::vec3(0.f, -1.f, 1.f)
+			vmath::vec3((float)sin(currentTime * 0.5f) * -1.f, -0.25f, (float)cos(currentTime * 0.5f) * -0.7f),
+			vmath::vec3(-1.f, 0.f, 0.f)
 		};
 
 		glUniform3f(glGetUniformLocation(shader_programs[1], "dirLight.direction"), -1.0f, 0.0f, 0.0f);
@@ -400,7 +400,7 @@ public:
 
 		glUniform3fv(glGetUniformLocation(shader_programs[1], "pointLights[1].position"), 1, pointLightPos[1]);
 		glUniform3f(glGetUniformLocation(shader_programs[1], "pointLights[1].ambient"), 0.1f, 0.1f, 0.1f);
-		glUniform3f(glGetUniformLocation(shader_programs[1], "pointLights[1].diffuse"), 0.8f, 0.8f, 0.8f);
+		glUniform3f(glGetUniformLocation(shader_programs[1], "pointLights[1].diffuse"), 1.f, 1.f, 1.f);
 		glUniform3f(glGetUniformLocation(shader_programs[1], "pointLights[1].specular"), 1.0f, 1.0f, 1.0f);
 		glUniform1f(glGetUniformLocation(shader_programs[1], "pointLights[1].c1"), 0.045f);
 		glUniform1f(glGetUniformLocation(shader_programs[1], "pointLights[1].c2"), 0.0075f);
