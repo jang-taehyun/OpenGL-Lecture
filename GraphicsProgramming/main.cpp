@@ -14,9 +14,12 @@
 class my_application : public sb7::application
 {
 private:
-	GLuint shader_programs[3];
-	GLuint VAOs[3], VBOs[3], EBOs[2];
+	GLuint shader_programs[5];
+	GLuint VAOs[4], VBOs[3], EBOs[2];
 	GLuint textures[3];
+	GLuint FBO;								// frame buffer
+	GLuint FBO_texture;
+	GLuint RBO;								// render buffer
 
 	std::vector<vmath::vec3> boxPositions;
 
@@ -66,12 +69,33 @@ public:
 		shader_programs[0] = compile_shader("./texture_vs.glsl", "./texture_fs.glsl");
 		shader_programs[1] = compile_shader("./vs.glsl", "./fs.glsl");
 		shader_programs[2] = compile_shader("./simple_color_vs.glsl", "./simple_color_fs.glsl");
+		shader_programs[3] = compile_shader("./framebuffer_vs.glsl", "./framebuffer_fs.glsl");
+		shader_programs[4] = compile_shader("./screen_filtering_vs.glsl", "./screen_filtering_fs.glsl");
 
 		// VAO, VBO, EBO, texture 생성
-		glGenVertexArrays(3, VAOs);
+		glGenVertexArrays(4, VAOs);
 		glGenBuffers(3, VBOs);
 		glGenBuffers(2, EBOs);
 		glGenTextures(3, textures);
+
+		glGenFramebuffers(1, &FBO);
+		glGenRenderbuffers(1, &RBO);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+		glGenTextures(1, &FBO_texture);
+		glBindTexture(GL_TEXTURE_2D, FBO_texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, info.windowWidth, info.windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_texture, 0);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, info.windowWidth, info.windowHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			glfwTerminate();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// 첫 번째 객체 정의 : 바닥 --------------------------------------------------
 		glBindVertexArray(VAOs[0]);
@@ -277,14 +301,40 @@ public:
 		boxPositions.push_back(vmath::vec3(1.5f, 2.0f, -2.5f));
 		boxPositions.push_back(vmath::vec3(1.5f, 0.2f, -1.5f));
 		boxPositions.push_back(vmath::vec3(-1.3f, 1.0f, -1.5f));
+
+		//  Post-processing용 스크린 정의 --------------------------------------------------
+		GLfloat screenVertices[] = {
+			//NDC xy좌표 //텍스처 UV
+			-1.0f, 1.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f,
+			1.0f, -1.0f, 1.0f, 0.0f,
+
+			-1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, -1.0f, 1.0f, 0.0f,
+			1.0f, 1.0f, 1.0f, 1.0f
+		};
+
+		
+		glBindVertexArray(VAOs[3]);
+		glBindBuffer(GL_ARRAY_BUFFER, VAOs[3]);
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	// 렌더링 virtual 함수를 작성해서 오버라이딩한다.
 	virtual void render(double currentTime)
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
 		const GLfloat color[] = { (float)sin(currentTime) * 0.5f + 0.5f, (float)cos(currentTime) * 0.5f + 0.5f, 0.0f, 1.0f };
-		const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-		glClearBufferfv(GL_COLOR, 0, black);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -480,6 +530,27 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(shader_programs[2], "model"), 1, GL_FALSE, transform);
 
 		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
+
+		// 윈도우 Framebuffer 바인딩 ----------------------------------------
+		glDisable(GL_DEPTH_TEST);
+		// 버퍼들의 값 지우기
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		// FBO Texture를 쉐이더 프로그램에 연결
+		glUseProgram(shader_programs[3]);
+		//vmath::mat4 rotateM = vmath::rotate(angle, 0.0f, 1.0f, 0.0f);
+		//glUniformMatrix4fv(uniform_transform1, 1, GL_FALSE, projM * lookAt * rotateM * vmath::scale(1.3f) * vmath::translate(0.0f, -0.25f, 0.0f));
+		// glUniform1i(glGetUniformLocation(shader_programs[3], "texture1"), 0);
+		glUniform1i(glGetUniformLocation(shader_programs[3], "screenTexture"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, FBO_texture);
+		glBindVertexArray(VAOs[3]);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glUseProgram(0);
+
+		// 기본 Framebuffer로 되돌리기
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	virtual void shutdown()

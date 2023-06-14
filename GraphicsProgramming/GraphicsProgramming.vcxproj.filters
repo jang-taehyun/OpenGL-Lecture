@@ -21,6 +21,10 @@
     <None Include="texture_vs.glsl" />
     <None Include="simple_color_fs.glsl" />
     <None Include="simple_color_vs.glsl" />
+    <None Include="framebuffer_vs.glsl" />
+    <None Include="framebuffer_fs.glsl" />
+    <None Include="screen_filtering_fs.glsl" />
+    <None Include="screen_filtering_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h" />
