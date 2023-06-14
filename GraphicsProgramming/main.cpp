@@ -10,6 +10,7 @@
 #include <shader.h>
 #include "stb_image.h"
 #include <vector>
+#include "Camera.h"
 
 class my_application : public sb7::application
 {
@@ -24,6 +25,13 @@ private:
 	std::vector<vmath::vec3> boxPositions;
 
 public:
+	virtual void init()
+	{
+		sb7::application::init();
+
+		info.samples = 8;
+	}
+
 	GLuint compile_shader(const char* vs_file, const char* fs_file)					// -> *vs_file, *fs_file 변경 가능 && vs_file, fs_file은 변경 불가능
 	{
 		GLuint vertex_shader = sb7::shader::load(vs_file, GL_VERTEX_SHADER);
@@ -64,6 +72,7 @@ public:
 
 	virtual void startup()
 	{
+		glEnable(GL_MULTISAMPLE);
 		stbi_set_flip_vertically_on_load(true);
 
 		shader_programs[0] = compile_shader("./texture_vs.glsl", "./texture_fs.glsl");
@@ -551,6 +560,24 @@ public:
 
 		// 기본 Framebuffer로 되돌리기
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	virtual void onKey(int key, int action)
+	{
+		if (action == GLFW_PRESS)
+		{
+			switch (key)
+			{
+			case '1':
+				break;
+			case ' ':
+				break;
+			case 'A':
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	virtual void shutdown()

@@ -28,5 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="..\..\SSU_CGP_13주차_대면_강의코드\Camera.h" />
   </ItemGroup>
 </Project>
